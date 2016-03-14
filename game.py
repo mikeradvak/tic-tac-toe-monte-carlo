@@ -66,11 +66,10 @@ def computer_go(positions):
     free_spaces = get_free_spaces(positions)
     scores = []
     for index, position in enumerate(free_spaces):
-        print scores
         scores.append([0, position, []])
-        print scores
         computer_move = simulate_computer_move(positions, scores, index)
-    print scores
+
+    #print scores
 
     high_score = 0
     computer_move = 0
@@ -81,6 +80,8 @@ def computer_go(positions):
 
     row = (computer_move - 1) / 3
     col = (computer_move - 1) % 3
+
+    print "Computer picked: " + str(positions[row][col])
     positions[row][col] = 'O'
 
 def simulate_computer_move(positions, scores, index):
@@ -89,7 +90,7 @@ def simulate_computer_move(positions, scores, index):
     #print "Free spaces: " + str(free_spaces)
 
     for position in free_spaces:
-        print "Checking (computer): " + str(position)
+        #print "Checking (computer): " + str(position)
         row = (position - 1) / 3
         col = (position - 1) % 3
 
@@ -106,7 +107,7 @@ def simulate_computer_move(positions, scores, index):
             if win_condition not in scores[index][2]:
                 scores[index][0] = scores[index][0] + 1
                 scores[index][2].append(win_condition)
-            print scores
+
             return
         elif not filled:
             status = simulate_human_move(tmp_positions, scores, index)
@@ -117,7 +118,7 @@ def simulate_human_move(positions, scores, index):
     #print "Free spaces: " + str(free_spaces)
 
     for position in free_spaces:
-        print "Checking (human): " + str(position)
+        #print "Checking (human): " + str(position)
         row = (position - 1) / 3
         col = (position - 1) % 3
 
@@ -179,3 +180,16 @@ while not game_complete:
     else:
         print "Computer going..."
         computer_go(positions)
+        
+        filled = is_filled(positions)
+        won    = is_won(positions)
+
+        #clear_screen()
+        board(positions)
+
+        if filled or won:
+            game_complete = True
+            if filled and not won:
+                print "It's a tie!"
+            else:
+                print "You lost!"
