@@ -1,4 +1,4 @@
-def board(t_positions):
+def board(positions):
     for row in t_positions:
         row_output = ""
         for position in row:
@@ -6,16 +6,21 @@ def board(t_positions):
         print row_output[:-1]
         print "-----"
 
-def register_move(move, positions, symbol):
+def check_move(move, positions, symbol):
     row = (move - 1) / 3
     col = (move - 1) % 3
 
     if (move >= 1 and move <= 9 and positions[row][col] != 'X' and positions[row][col] != 'O'):
-        positions[row][col] = symbol
         return True
     else:
         print "Invalid move!"
         return False
+
+def register_move(move, positions, symbol):
+    row = (move - 1) / 3
+    col = (move - 1) % 3
+
+    positions[row][col] = symbol
 
 def is_filled(positions):
     filled = True
@@ -44,33 +49,20 @@ def get_free_spaces(positions):
 
     return free_spaces
 
-def computer_go(t_positions):
-    fuck = t_positions[:]
-    computer_move = simulate_computer_move(fuck[:])
-    print "@@@"
-    board(positions)
-    print "###"
-    board(t_positions)
+def computer_go(positions):
+    computer_move = simulate_computer_move(positions)
     return True
 
-def simulate_computer_move(t_positions):
-    free_spaces = get_free_spaces(t_positions[:])
+def simulate_computer_move(positions):
+    free_spaces = get_free_spaces(positions)
     best_status = [-1, -1]
 
     for position in free_spaces:
         print "Checking (computer): " + str(position)
         row = (position - 1) / 3
         col = (position - 1) % 3
-        #tmp_positions = t_positions[:]
-        #tmp_positions[row][col] = 'O'
-        print "1"
-        board(positions[:])
-        print "2"
-        board(t_positions[:])
-        print "3"
-        board(tmp_positions[:])
-        print positions is t_positions
-        die()
+
+        positions[row][col] = 'O'
     
         filled = is_filled(tmp_positions[:])
         won    = is_won(tmp_positions[:])
@@ -78,10 +70,7 @@ def simulate_computer_move(t_positions):
         if won:
             status = [1, position]
         elif not filled:
-            print "$$$"
-            board(positions)
-            print "$$$"
-            status = simulate_human_move(tmp_positions[:])
+            status = simulate_human_move(positions)
         else:
             status = [-1, position]
 
@@ -102,10 +91,8 @@ def simulate_human_move(t_positions):
         print "Checking (human): " + str(position)
         row = (position - 1) / 3
         col = (position - 1) % 3
-        board(positions)
-        tmp_positions = t_positions[:]
-        tmp_positions[row][col] = 'X'
-        board(tmp_positions)
+
+        positions[row][col] = 'X'
     
         filled = is_filled(tmp_positions)
         won    = is_won(tmp_positions)
@@ -113,7 +100,7 @@ def simulate_human_move(t_positions):
         if won:
             status = [-1, position]
         elif not filled:
-            status = simulate_computer_move(tmp_positions[:])
+            status = simulate_computer_move(positions)
         else:
             status = [0, position]
 
@@ -135,22 +122,20 @@ positions[0] = range(1,4)
 positions[1] = range(4,7)
 positions[2] = range(7,10)
 
-game_complete = False
-
 while not game_complete:
     #clear_screen()
-    board(positions)
+    board(positions[:])
 
     move_ok = False
     while not move_ok:
         move    = input('Select a move: ')
-        move_ok = register_move(move, positions, 'X')
+        move_ok = register_move(move, positions[:], 'X')
 
-    filled = is_filled(positions)
-    won    = is_won(positions)
+    filled = is_filled(positions[:])
+    won    = is_won(positions[:])
 
     #clear_screen()
-    board(positions)
+    board(positions[:])
 
     if filled or won:
         game_complete = True
