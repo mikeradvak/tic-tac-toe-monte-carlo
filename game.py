@@ -48,9 +48,11 @@ def get_win_condition(positions):
 
     for i in range(3):
         if (positions[i][0] == positions[i][1] and positions[i][0] == positions[i][2]):
-            return [positions[i][0], positions[i][1], positions[i][2]]
+            actual_value = (i * 3) + 1
+            return [actual_value, actual_value + 1, actual_value + 2]
         elif (positions[0][i] == positions[1][i] and positions[0][i] == positions[2][i]):
-            return [positions[0][i], positions[1][i], positions[2][i]]
+            actual_value = i + 1
+            return [actual_value, actual_value + 3, actual_value + 6]
 
 def get_free_spaces(positions):
     free_spaces = []
@@ -64,12 +66,16 @@ def get_free_spaces(positions):
 
 def computer_go(positions):
     free_spaces = get_free_spaces(positions)
-    scores = []
+    scores      = []
+
+    for position in free_spaces:
+        scores.append([0, position, []])
+
     for index, position in enumerate(free_spaces):
         scores.append([0, position, []])
         computer_move = simulate_computer_move(positions, scores, index)
 
-    #print scores
+    print scores
 
     high_score = 0
     computer_move = 0
@@ -99,12 +105,12 @@ def simulate_computer_move(positions, scores, index):
 
         #board(tmp_positions)
     
-        filled        = is_filled(tmp_positions)
-        won           = is_won(tmp_positions)
-        win_condition = get_win_condition(tmp_positions)
+        filled = is_filled(tmp_positions)
+        won    = is_won(tmp_positions)
 
         if won:
-            if win_condition not in scores[index][2]:
+            win_condition = get_win_condition(tmp_positions)
+            if win_condition not in scores[index][2] and scores[index][1] in win_condition:
                 scores[index][0] = scores[index][0] + 1
                 scores[index][2].append(win_condition)
 
@@ -131,8 +137,11 @@ def simulate_human_move(positions, scores, index):
         won    = is_won(tmp_positions)
 
         if won:
-            #scores[index][0] = scores[index][0] - 1
-            #print scores
+            win_condition = get_win_condition(tmp_positions)
+            if win_condition not in scores[index][2]:
+                for score in scores:
+                    if score[1] == position:
+                        score[0] = score[0] + 10
             return
         elif not filled:
             status = simulate_computer_move(tmp_positions, scores, index)
@@ -154,10 +163,10 @@ positions[2] = range(7,10)
 
 game_complete = False
 
-while not game_complete:
-    #clear_screen()
-    board(positions)
+#clear_screen()
+board(positions)
 
+while not game_complete:
     move_ok = False
     while not move_ok:
         move    = input('Select a move: ')
