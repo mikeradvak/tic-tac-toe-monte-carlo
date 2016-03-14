@@ -69,10 +69,9 @@ def computer_go(positions):
     scores      = []
 
     for position in free_spaces:
-        scores.append([0, position, []])
+        scores.append([0, position, [], []])
 
     for index, position in enumerate(free_spaces):
-        scores.append([0, position, []])
         computer_move = simulate_computer_move(positions, scores, index)
 
     print scores
@@ -138,10 +137,11 @@ def simulate_human_move(positions, scores, index):
 
         if won:
             win_condition = get_win_condition(tmp_positions)
-            if win_condition not in scores[index][2]:
+            if win_condition not in scores[index][3]:
+                scores[index][3].append(win_condition)
                 for score in scores:
                     if score[1] == position:
-                        score[0] = score[0] + 10
+                        score[0] = score[0] +10
             return
         elif not filled:
             status = simulate_computer_move(tmp_positions, scores, index)
