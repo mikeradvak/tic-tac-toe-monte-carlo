@@ -67,16 +67,20 @@ def get_free_spaces(positions):
 def computer_go(positions):
     free_spaces = get_free_spaces(positions)
     scores      = []
+    win_computer_value = 2
+    win_human_value    = 3
+    max_depth          = 1
+    current_depth      = 1
 
     for position in free_spaces:
-        scores.append([0, position, [], []])
+        scores.append([0.0, position, [], []])
 
     for index, position in enumerate(free_spaces):
-        computer_move = simulate_computer_move(positions, scores, index)
+        computer_move = simulate_computer_move(positions, scores, index, win_computer_value, win_human_value, max_depth, current_depth)
 
     print scores
 
-    high_score = 0
+    high_score = 0.0
     computer_move = 0
     for score in scores:
         if score[0] >= high_score:
@@ -89,7 +93,7 @@ def computer_go(positions):
     print "Computer picked: " + str(positions[row][col])
     positions[row][col] = 'O'
 
-def simulate_computer_move(positions, scores, index):
+def simulate_computer_move(positions, scores, index, win_computer_value, win_human_value, max_depth, current_depth):
     free_spaces = get_free_spaces(positions)
 
     #print "Free spaces: " + str(free_spaces)
@@ -108,16 +112,29 @@ def simulate_computer_move(positions, scores, index):
         won    = is_won(tmp_positions)
 
         if won:
+            #win_condition = get_win_condition(tmp_positions)
+            #if win_condition not in scores[index][2] and scores[index][1] in win_condition:
+                #scores[index][0] = scores[index][0] + ((max_depth - current_depth) * win_computer_value)
+                #scores[index][2].append(win_condition)
             win_condition = get_win_condition(tmp_positions)
-            if win_condition not in scores[index][2] and scores[index][1] in win_condition:
-                scores[index][0] = scores[index][0] + 1
-                scores[index][2].append(win_condition)
+            win_condition.append(current_depth)
 
+            #print "Computer wins in " + str(current_depth)
+
+            for score in scores:
+                if score[1] == position:
+                    if win_condition not in score[2]:
+                        #print "Adding " + str(pow(win_computer_value, (max_depth - current_depth))) + " to " + str(score[1]) + "(" + str(win_computer_value) + ", " + str(max_depth - current_depth) + ")"
+
+                        score[2].append(win_condition)
+                        score[0] = score[0] + pow(win_computer_value, (max_depth - current_depth))
+                        #print str(score[0])
+                    break
             return
         elif not filled:
-            status = simulate_human_move(tmp_positions, scores, index)
+            status = simulate_human_move(tmp_positions, scores, index, win_computer_value, win_human_value, max_depth, current_depth)
 
-def simulate_human_move(positions, scores, index):
+def simulate_human_move(positions, scores, index, win_computer_value, win_human_value, max_depth, current_depth):
     free_spaces = get_free_spaces(positions)
 
     #print "Free spaces: " + str(free_spaces)
@@ -137,15 +154,24 @@ def simulate_human_move(positions, scores, index):
 
         if won:
             win_condition = get_win_condition(tmp_positions)
-            if win_condition not in scores[index][3]:
-                scores[index][3].append(win_condition)
-                for score in scores:
-                    if score[1] == position:
-                        score[0] = score[0] +10
-            return
-        elif not filled:
-            status = simulate_computer_move(tmp_positions, scores, index)
+            win_condition.append(current_depth)
 
+            #print "Human wins in " + str(current_depth)
+
+            for score in scores:
+                if score[1] == position:
+                    if win_condition not in score[3]:
+                        #print "Adding " + str(pow(win_human_value, (max_depth - current_depth))) + " to " + str(score[1]) + "(" + str(win_human_value) + ", " + str(max_depth - current_depth) + ")"
+
+                        score[3].append(win_condition)
+                        score[0] = score[0] + pow(win_human_value, (max_depth - current_depth))
+
+                        #print str(score[0])
+                    break                         
+            return                                
+        elif not filled:                          
+            status = simulate_computer_move(tmp_positions, scores, index, win_computer_value, win_human_value, max_depth, current_depth + 1)
+                                                  
 def clear_screen():
     print(chr(27) + "[2J")
 
@@ -162,6 +188,19 @@ positions[1] = range(4,7)
 positions[2] = range(7,10)
 
 game_complete = False
+
+
+move_ok = False
+while not move_ok:
+    move    = input('Do you want to go first or second (1 or 2): ')
+    if move == 1 or move == 2:
+        move_ok = True
+    else:
+        print 'Please enter 1 (first) or 2 (second).'
+
+if (move == 2):
+    computer_go(positions)
+
 
 #clear_screen()
 board(positions)
