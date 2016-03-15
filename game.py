@@ -65,6 +65,8 @@ def get_free_spaces(positions):
     return free_spaces
 
 def computer_go(positions):
+    print "Computer going..."
+
     free_spaces = get_free_spaces(positions)
     scores      = []
     win_computer_value = 2
@@ -78,7 +80,7 @@ def computer_go(positions):
     for index, position in enumerate(free_spaces):
         computer_move = simulate_computer_move(positions, scores, index, win_computer_value, win_human_value, max_depth, current_depth)
 
-    print scores
+    #print scores
 
     high_score = 0.0
     computer_move = 0
@@ -226,7 +228,6 @@ while not game_complete:
         else:
             print "You won!"
     else:
-        print "Computer going..."
         computer_go(positions)
         
         filled = is_filled(positions)
